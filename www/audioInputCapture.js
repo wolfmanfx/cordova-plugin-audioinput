@@ -21,8 +21,6 @@ var exec = require('cordova/exec');
 
 var audioinput = {};
 
-var hasTypedArrays = 'Int16Array' in window && 'Float32Array' in window;
-
 // Audio formats
 audioinput.FORMAT = {
     PCM_16BIT: 'PCM_16BIT',
@@ -366,29 +364,13 @@ audioinput._audioInputDebugEvent = function (debugMessage) {
 };
 
 /**
- * Returns a typed array, normalizing if needed
- * @param {number[]} pcmData - Array of short integers which came from the plugin
+ * Normalize audio input
+ *
+ * @param {Object} pcmData
+ * @private
  */
-function normalizeToTyped(pcmData) {
-    if (audioinput._cfg.normalize) {
-        var out = Float32Array.from(pcmData, function(i) {
-            return parseFloat(i) / audioinput._cfg.normalizationFactor;
-        });
-        // If last value is NaN, remove it.
-        if (isNaN(out.subarray[out.length - 1])) {
-            return out.subarray(0, out.length - 1);
-        }
-        return out;
-    }
+audioinput._normalizeAudio = function (pcmData) {
 
-    return Int16Array.from(pcmData);
-}
-
-/**
- * Returns a standard javascript array, normalizing if needed
- * @param {number[]} pcmData - Array of short integers which came from the plugin
- */
-function normalizeNoTyped (pcmData) {
     if (audioinput._cfg.normalize) {
         for (var i = 0; i < pcmData.length; i++) {
             pcmData[i] = parseFloat(pcmData[i]) / audioinput._cfg.normalizationFactor;
@@ -401,22 +383,7 @@ function normalizeNoTyped (pcmData) {
     }
 
     return pcmData;
-}
-
-/**
- * Normalize audio input
- * 
- * If typed arrays are supported by the browser then a Float32Array will be returned
- * if nomalization is enabled; if not then a Int16Array will be returned. These are
- * much more efficient to work with since you can get subarrays without copying them.
- * If typed arrays are not supported then a normal array will be returned
- *
- * @param {Object} pcmData
- * @private
- * 
- * @returns {Int16Array|Float32Array|Array} 
- */
-audioinput._normalizeAudio = hasTypedArrays ? normalizeToTyped : normalizeNoTyped;
+};
 
 
 /**
