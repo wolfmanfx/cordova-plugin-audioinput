@@ -104,7 +104,8 @@ void HandleInputBuffer(void* inUserData,
             // assign fileUrl
             NSCharacterSet *set = [NSCharacterSet URLHostAllowedCharacterSet];
             _fileUrl = [NSURL URLWithString:[url stringByAddingPercentEncodingWithAllowedCharacters:set]];
-            if (_fileUrl.isFileURL) {
+            //if (_fileUrl.isFileURL) 
+            {
                 _filePath = _fileUrl.path;
                 NSLog(@"[INFO] iosaudiorecorder:temp file path: %@", _filePath);
             }
